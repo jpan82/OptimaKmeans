@@ -2,10 +2,12 @@
 *.d
 
 # Compiled Object files
-*.slo
-*.lo
 *.o
 *.obj
+*.so
+*.dylib
+*.dll
+*.exe
 
 # Precompiled Headers
 *.gch
@@ -39,3 +41,24 @@
 
 # debug information files
 *.dwo
+
+
+# CUDA
+*.i
+*.ii
+*.gpu
+*.ptx
+*.cubin
+*.fatbin
+
+# Compiler
+.vscode/
+.DS_Store
+build/
+
+# Python
+__pycache__/
+*.pyc
+
+# data
+data/
