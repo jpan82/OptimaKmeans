@@ -19,8 +19,8 @@ double* optima_kmeans(double *points, int num_points, int dim, int k, int max_it
     return kmeans(points, num_points, dim, k, max_iter, clusters);
 }
 
-void optima_malloc_clusters(int** clusters, int k) {
-    *clusters = malloc(k * sizeof(int));
+void optima_malloc_clusters(int** clusters, int n) {
+    *clusters = malloc(n * sizeof(int));
 }
 
 void optima_free_data(double* data, double* centroids, int* clusters) {
