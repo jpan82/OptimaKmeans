@@ -14,11 +14,11 @@ __global__ void find_centroid(double *d_data, double *d_centroids, int *d_cluste
                                   int N, int D, int K);
 
 // Calculating the centroids
-__global__ void calculate_centroid(double *d_data, int *d_clusters, double *d_new_centroids, 
-                              int *d_counts, int N, int D, int K);
+__global__ void centroid_sum(double *d_data, int *d_clusters, double *d_new_centroids, int *d_counts, int N, int D, int K)
+__global__ void calculate_centroid(double *d_new_centroids, int *d_counts, int D, int K);
 
 // Host-side GPU entry point. Returns centroid array with size K * D.
-double* kmeans_gpu(double *data, int num_points, int dim, int k, int max_iteration, int *clusters);
+double* kmeans_gpu(double *d_data, int num_points, int dim, int k, int max_iteration, int *d_clusters);
 
 #ifdef __cplusplus
 }
