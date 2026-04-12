@@ -1,5 +1,6 @@
 // example main.c
 #include <stdio.h>
+#include <time.h>
 #include "OptimaKmeans/optima_kmeans.h"
 
 int main() {
@@ -17,7 +18,15 @@ int main() {
     int max_iter = 1000;
     int* clusters;
     optima_malloc_clusters(&clusters, n);
-    double* centroids = optima_kmeans(data, n, d, k, max_iter, clusters);
+
+    struct timespec t0, t1;
+    clock_gettime(CLOCK_MONOTONIC, &t0);
+    double* centroids = optima_kmeans_gpu(data, n, d, k, max_iter, clusters);
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+
+    double elapsed_sec = (double)(t1.tv_sec - t0.tv_sec) +
+                         (double)(t1.tv_nsec - t0.tv_nsec) / 1e9;
+    printf("k-means elapsed time: %.6f s (%.3f ms)\n", elapsed_sec, elapsed_sec * 1e3);
     
 #ifdef DEBUG
     // Print centroids

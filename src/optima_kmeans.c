@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+//extern
+double* kmeans_gpu(double *h_data, int num_points, int dim, int k, int max_iteration, int *h_clusters);
 
 int optima_load_data_bin(const char* filename, double** data, int* n, int* d) {
     return load_data_bin(filename, data, n, d);
@@ -29,15 +31,6 @@ void optima_free_data(double* data, double* centroids, int* clusters) {
     free(clusters);
 }
 
-void optima_kmeans_gpu(double *h_data, int n, int d, int k, int max_iter, int *h_clusters, double *h_initial_centroids) {
-    double *d_data, *d_centroids;
-    int *d_clusters;
-    cudaMalloc(&d_data, n * d * sizeof(double));
-    cudaMalloc(&d_clusters, n * sizeof(int));
-    cudaMemcpy(d_data, h_data, n * d * sizeof(double), cudaMemcpyHostToDevice);
-    double* d_final_centroids = kmeans_gpu(d_data, n, d, k, max_iter, d_clusters, h_initial_centroids);
-    cudaMemcpy(h_clusters, d_clusters, n * sizeof(int), cudaMemcpyDeviceToHost);
-    cudaFree(d_data);
-    cudaFree(d_clusters);
-    cudaFree(d_final_centroids);
+double* optima_kmeans_gpu(double *data, int num_points, int dim, int k, int max_iteration, int *clusters) {
+    return kmeans_gpu(data, num_points, dim, k, max_iteration, clusters);
 }

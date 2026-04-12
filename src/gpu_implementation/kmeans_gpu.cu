@@ -82,16 +82,33 @@ __global__ void calculate_centroid(double *d_new_centroids, int *d_counts, int D
     
 }
 
-double* kmeans_gpu(double *d_data, int num_points, int dim, int k, int max_iteration, int *d_clusters, double *h_initial_centroids)
+double* kmeans_gpu(double *h_data, int num_points, int dim, int k, int max_iteration, int *h_clusters)
 {
+    double *h_initial_centroids = (double *)malloc((size_t)k * (size_t)dim * sizeof(double));
+    if (h_initial_centroids == NULL) {
+        return NULL;
+    }
+
+    for (int cid = 0; cid < k; cid++) {
+        int src_idx = cid % num_points;
+        for (int d = 0; d < dim; d++) {
+            h_initial_centroids[cid * dim + d] = h_data[src_idx + (d * num_points)];
+        }
+    }
+
+    double *d_data;
+    int *d_clusters;
     double *d_new_centroids;
     double *d_centroids;
     int *d_counts;
 
+    cudaMalloc(&d_data, num_points * dim * sizeof(double));
+    cudaMalloc(&d_clusters, num_points * sizeof(int));
     cudaMalloc(&d_new_centroids, k * dim * sizeof(double));
     cudaMalloc(&d_centroids, k * dim * sizeof(double));
     cudaMalloc(&d_counts, k * sizeof(int));
 
+    cudaMemcpy(d_data, h_data, num_points * dim * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_centroids, h_initial_centroids, k * dim * sizeof(double), cudaMemcpyHostToDevice);
     
     size_t shared_mem_size = k * dim * sizeof(double);
@@ -110,8 +127,18 @@ double* kmeans_gpu(double *d_data, int num_points, int dim, int k, int max_itera
         cudaMemcpy(d_centroids, d_new_centroids, k * dim * sizeof(double), cudaMemcpyDeviceToDevice);
     }
 
+    double *h_centroids = (double *)malloc((size_t)k * (size_t)dim * sizeof(double));
+    if (h_centroids != NULL) {
+        cudaMemcpy(h_centroids, d_centroids, k * dim * sizeof(double), cudaMemcpyDeviceToHost);
+    }
+    cudaMemcpy(h_clusters, d_clusters, num_points * sizeof(int), cudaMemcpyDeviceToHost);
+
+    free(h_initial_centroids);
     cudaFree(d_counts);
     cudaFree(d_new_centroids);
-    
-    return d_centroids;
+    cudaFree(d_centroids);
+    cudaFree(d_clusters);
+    cudaFree(d_data);
+
+    return h_centroids;
 }
