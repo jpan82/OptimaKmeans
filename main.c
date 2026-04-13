@@ -15,7 +15,7 @@ int main() {
 
     // Run k-means
     int k = 5; // number of clusters
-    int max_iter = 1000;
+    int max_iter = 1;
     int* clusters;
     optima_malloc_clusters(&clusters, n);
 
